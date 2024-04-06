@@ -1,0 +1,101 @@
+:root {
+}
+@font-face {
+  font-family: Helvica;
+  src: url("./font/HelveticaNeueThin.otf");
+  font-weight: 100;
+}
+@font-face {
+  font-family: Helvica;
+  src: url("./font/HelveticaNeueMedium.otf");
+  font-weight: 300;
+}
+@font-face {
+  font-family: Helvica;
+  src: url("./font/HelveticaNeueRoman.otf");
+  font-weight: 200;
+}
+.main {
+  overflow-y: auto;
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(#00a884 36.5% ,#f0f2f5  36.5% 80%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.linha{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 75%;
+  height: auto;
+}
+.menu_{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 600px;
+  width: 100%;
+  background: white;
+  box-shadow: 0 17px 50px 0 rgba(11, 20, 26, .19), 0 12px 15px 0 rgba(11, 20, 26, .24);
+}
+.menu_ .campo{
+  border-radius: 30px;
+  border: 0.5px solid #d1d7db;
+  background: #f0f2f5;
+  height: 60%;
+  width: 80%;
+}
+.menu_ .add{
+  color: white;
+  background: #00a884;
+  border: none;
+  width: 120px;
+  height: 70px;
+}
+.menu_ .add:hover{
+  background: white;
+  color: #00a884;
+  border: 1px solid #00a884;
+  cursor: pointer;
+}
+.menu_ h3{
+  text-align: center;
+  font-size: 16px;
+  font-weight: 200;
+  color: #3b4a54;
+  margin: 60px;
+}
+.menu_ .insert{
+  margin-top: 30px;
+  font-size: 28px;
+  font-weight: 100;
+  color: #41525d;
+}
+.nome p{
+  font-weight: 200;
+  font-size: 13px;
+  margin-left: 10px;
+}
+.nome{
+  margin: 30px;
+  color: white;
+  padding-top: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+* {
+  font-family: Helvica;
+  font-weight: 200;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
