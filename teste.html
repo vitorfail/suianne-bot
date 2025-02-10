@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag and Drop com Popup de Z-Index</title>
+</head>
+<body>
+    <style>
+        /* Estilos para a área de drop pequena */
+.drop-area {
+    width: 200px;
+    height: 100px;
+    margin: 20px auto;
+    border: 2px dashed #aaa;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Estilos para a área onde as imagens podem ser movidas */
+.image-container {
+    width: 80%;
+    height: 80vh;
+    margin: 20px auto;
+    border: 2px solid #aaa;
+    position: relative;
+    background-color: #f9f9f9;
+    overflow: hidden;
+}
+
+/* Popup de controle de Z-Index */
+#popup-menu {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+#popup-menu button {
+    display: block;
+    margin: 5px;
+    padding: 5px;
+}
+.line {
+            position: absolute;
+            background-color: black;
+            width: 2px; /* Espessura da linha */
+            transform-origin: top left; /* Para girar corretamente */
+        }
+#popup-menu #btn-delete {
+    background-color: #f44336; /* Vermelho */
+    color: white;
+}
+/* Imagens dentro da área de movimento */
+img {
+    position: absolute;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+img.dragging {
+    opacity: 0.5;
+}
+body{
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+.botoes button{
+    color: white;
+    cursor: pointer;
+    width: 120px;
+    height: 50px;
+    font-size: 20px;
+    border: none;
+}
+.botoes button:nth-child(1){
+    background: #ff1010;
+}
+.botoes button:nth-child(2){
+    background: #009035;
+}
+.botoes button:nth-child(3){
+    background: #004690;
+}
+.botoes .show:nth-child(1){
+    color: #ff1010;
+    background: white;
+    border: 2px solid #ff1010;
+}
+.botoes .show:nth-child(2){
+    color: #009035;
+    background: white;
+    border: 2px solid #009035;
+}
+.botoes .show:nth-child(3){
+    color: #004690;
+    background: white;
+    border: 2px solid #004690;
+}
+    </style>
+    <!-- Área pequena para "dropar" imagens -->
+    <div id="drop-area" class="drop-area">
+        <p>Arraste suas imagens aqui</p>
+    </div>
+    <div class="botoes">
+        <button onclick="trocar_funcao(this, 1)" >Mover</button>
+        <button onclick="trocar_funcao(this, 2)" >Esqueleto</button>
+        <button onclick="trocar_funcao(this, 3)" >Animar</button>
+    </div>
+    <!-- Área onde a imagem pode ser movida -->
+    <div id="image-container" class="image-container">
+        <!-- Imagens serão movidas aqui -->
+    </div>
+
+    <!-- Popup de controle de Z-Index -->
+    <div id="popup-menu" class="popup-menu">
+        <button id="btn-up">Subir</button>
+        <button id="btn-down">Descer</button>
+        <button id="btn-delete">Excluir</button>
+    </div>
+
+    <script>
+        let funcoes = 1
+        function trocar_funcao(t,v){
+            funcoes = v
+            t.className="show"
+        }
+        // Seleção dos elementos principais
+const dropArea = document.getElementById("drop-area");
+const imageContainer = document.getElementById("image-container");
+const popupMenu = document.getElementById("popup-menu");
+const btnUp = document.getElementById("btn-up");
+const btnDown = document.getElementById("btn-down");
+const btnDelete = document.getElementById("btn-delete");
+
+// Variáveis para controlar a imagem selecionada
+let selectedImage = null;
+let offsetX, offsetY;
+
+// Função para permitir o arraste da imagem
+function makeDraggable(img) {
+        img.addEventListener('mousedown', (e) => {
+            if(funcoes ==1){
+                e.preventDefault();
+                selectedImage = img;
+                offsetX = (img.width+e.clientX)-(img.getBoundingClientRect().left);
+                offsetY = (img.height+e.clientY) - img.getBoundingClientRect().top;
+                img.classList.add('dragging');
+                
+                // Adiciona o evento de movimento do mouse
+                document.addEventListener('mousemove', dragImage);
+                document.addEventListener('mouseup', () => {
+                    document.removeEventListener('mousemove', dragImage);
+                    img.classList.remove('dragging');
+                });
+            }
+        });
+
+}
+// Função para excluir a imagem
+btnDelete.addEventListener('click', () => {
+    if (selectedImage) {
+        selectedImage.remove();  // Remove a imagem do DOM
+        popupMenu.style.display = 'none';  // Fecha o popup
+        selectedImage = null;  // Limpa a imagem selecionada
+    }
+});
+// Função para arrastar a imagem
+function dragImage(e) {
+    if (selectedImage) {
+        selectedImage.style.left = `${e.clientX - offsetX}px`;
+        selectedImage.style.top = `${e.clientY - offsetY}px`;
+    }
+}
+
+// Função para exibir o popup
+function showPopup(e, img) {
+    e.preventDefault();
+    
+    // Posiciona o popup perto do clique
+    popupMenu.style.left = `${e.clientX + 10}px`;
+    popupMenu.style.top = `${e.clientY + 10}px`;
+    popupMenu.style.display = 'block';
+    
+    // Define a imagem selecionada
+    selectedImage = img;
+}
+
+// Função para manipular o z-index
+btnUp.addEventListener('click', () => {
+    if (selectedImage) {
+        let zIndex = parseInt(window.getComputedStyle(selectedImage).zIndex) || 0;
+        selectedImage.style.zIndex = zIndex + 1;
+        popupMenu.style.display = 'none';  // Fecha o popup
+    }
+});
+
+btnDown.addEventListener('click', () => {
+    if (selectedImage) {
+        let zIndex = parseInt(window.getComputedStyle(selectedImage).zIndex) || 0;
+        
+        // Impede que o z-index seja menor que 1
+        if (zIndex > 1) {
+            selectedImage.style.zIndex = zIndex - 1;
+        }
+        popupMenu.style.display = 'none';  // Fecha o popup
+    }
+});
+
+// Função para permitir o "drop" da imagem
+dropArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+});
+
+dropArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    
+    const files = e.dataTransfer.files;
+    
+    if (files.length > 0) {
+        const file = files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(event) {
+            const img = document.createElement('img');
+            img.src = event.target.result;
+            
+            // A imagem será carregada com a largura e altura originais
+            img.onload = function() {
+                img.style.width = `${img.naturalWidth}px`;
+                img.style.height = `${img.naturalHeight}px`;
+                img.style.left = '0px'; // Inicialmente na posição 0
+                img.style.top = '0px'; // Inicialmente na posição 0
+                
+                // Adiciona o evento de click com o botão direito
+                img.addEventListener('contextmenu', (e) => showPopup(e, img));
+                
+                // Torna a imagem arrastável
+                makeDraggable(img);
+                
+                imageContainer.appendChild(img); // Adiciona a imagem à área de movimento
+            };
+        };
+        
+        reader.readAsDataURL(file);
+    }
+});
+
+// Fecha o popup se o usuário clicar fora dele
+document.addEventListener('click', (e) => {
+    if (!popupMenu.contains(e.target) && selectedImage) {
+        popupMenu.style.display = 'none';
+    }
+});
+        let points = []; // Array para armazenar os pontos clicados
+
+        // Função para desenhar a linha usando divs e CSS
+        function drawLine() {
+            if(funcoes ==2){
+                if (points.length === 2) {
+                const dx = points[1].x - points[0].x; // Diferença em X
+                const dy = points[1].y - points[0].y; // Diferença em Y
+                const length = Math.sqrt(dx * dx + dy * dy); // Comprimento da linha
+                const angle = Math.atan2(dy, dx) * (180 / Math.PI); // Ângulo da linha em relação ao eixo X
+
+                // Cria a div para a linha
+                const line = document.createElement("div");
+                line.classList.add("line");
+                line.style.height = `${length}px`; // Define o comprimento da linha
+                line.style.left = `${points[0].x}px`; // Define a posição X do início
+                line.style.top = `${points[0].y}px`; // Define a posição Y do início
+                line.style.transform = `rotate(${angle}deg)`; // Gira a div para a direção correta
+
+                // Adiciona a linha ao container
+                imageContainer.appendChild(line);
+
+                // Limpa os pontos após desenhar a linha
+                points = [];
+            }
+
+            }
+        }
+
+        // Adiciona um ponto e desenha a linha quando dois pontos são clicados
+        imageContainer.addEventListener("click", function(event) {
+            if (points.length < 2) {
+                // Captura a posição do clique no container
+                const x = event.offsetX;
+                const y = event.offsetY;
+
+                // Adiciona o ponto ao array
+                points.push({ x: x, y: y });
+
+                // Se houver 2 pontos, desenha a linha
+                if (points.length === 2) {
+                    drawLine();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

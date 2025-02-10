@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Suianne Bot</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="icone123.ico" type="image/x-icon">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-qrcode/0.18.0/jquery.qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+</head>
+<body>
+    <div id="main" class="main">
+        <div class="popup" id="popup">
+          <div class="menu">
+            <p style="height: 50px;">Deseja continuar de onde parou ou começar do zero?</p>
+            <div class="b">
+              <button class="add" onclick="enviar_api(1)">Do zero</button>
+              <button class="add" onclick="enviar_api(2)">Onde Parou</button>
+            </div>
+          </div>
+        </div>
+        <div class="linha">
+          <div class="nome">
+            <svg xmlns="http://www.w3.org/2000/svg"  width="39" height="39" viewBox="0 0 39 39">
+              <path fill="#00E676" id="icon" d="M10.7 32.8l.6.3c2.5 1.5 5.3 2.2 8.1 2.2 8.8 0 16-7.2 16-16 0-4.2-1.7-8.3-4.7-11.3s-7-4.7-11.3-4.7c-8.8 0-16 7.2-15.9 16.1 0 3 .9 5.9 2.4 8.4l.4.6-1.6 5.9 6-1.5z"></path><path fill="#FFF" d="M32.4 6.4C29 2.9 24.3 1 19.5 1 9.3 1 1.1 9.3 1.2 19.4c0 3.2.9 6.3 2.4 9.1L1 38l9.7-2.5c2.7 1.5 5.7 2.2 8.7 2.2 10.1 0 18.3-8.3 18.3-18.4 0-4.9-1.9-9.5-5.3-12.9zM19.5 34.6c-2.7 0-5.4-.7-7.7-2.1l-.6-.3-5.8 1.5L6.9 28l-.4-.6c-4.4-7.1-2.3-16.5 4.9-20.9s16.5-2.3 20.9 4.9 2.3 16.5-4.9 20.9c-2.3 1.5-5.1 2.3-7.9 2.3zm8.8-11.1l-1.1-.5s-1.6-.7-2.6-1.2c-.1 0-.2-.1-.3-.1-.3 0-.5.1-.7.2 0 0-.1.1-1.5 1.7-.1.2-.3.3-.5.3h-.1c-.1 0-.3-.1-.4-.2l-.5-.2c-1.1-.5-2.1-1.1-2.9-1.9-.2-.2-.5-.4-.7-.6-.7-.7-1.4-1.5-1.9-2.4l-.1-.2c-.1-.1-.1-.2-.2-.4 0-.2 0-.4.1-.5 0 0 .4-.5.7-.8.2-.2.3-.5.5-.7.2-.3.3-.7.2-1-.1-.5-1.3-3.2-1.6-3.8-.2-.3-.4-.4-.7-.5h-1.1c-.2 0-.4.1-.6.1l-.1.1c-.2.1-.4.3-.6.4-.2.2-.3.4-.5.6-.7.9-1.1 2-1.1 3.1 0 .8.2 1.6.5 2.3l.1.3c.9 1.9 2.1 3.6 3.7 5.1l.4.4c.3.3.6.5.8.8 2.1 1.8 4.5 3.1 7.2 3.8.3.1.7.1 1 .2h1c.5 0 1.1-.2 1.5-.4.3-.2.5-.2.7-.4l.2-.2c.2-.2.4-.3.6-.5s.4-.4.5-.6c.2-.4.3-.9.4-1.4v-.7s-.1-.1-.3-.2z"></path></svg>
+            <p>SUIANNE BOT</p>
+          </div>
+          <div class="menu_">
+            <p class="insert">Voce deseja enviar para seus contatos, ou apartir de uma lista</p>
+            <div class="escolha">
+              <button onclick="selecionar(1)">Meus Contatos</button>
+              <button onclick="selecionar(2)">Importar lista(xls)</button>
+            </div>
+              <div id="op2" class="espaco">
+                <div class="campo">
+                  <div id="imagePreview"></div>
+                  <input type="file" id="fileInput"  name="fileInput" name="imageInput" accept="image/*">
+                  <div id="menssagem" contenteditable="true" oninput="formatText(event)" placeholder="Insira sua mensagem"></div>
+                  <p style="text-align: center; size: 20px; color: #00a884;">Delay</p>
+                  <input type="number" id="delay" step="any" placeholder="Segundos" min="0.2" value="7">
+                </div>
+                <div class="botoes">
+                  <h4 class="contato" style="size: 15px; border:1px solid #0e6dc5; padding: 9px; color: #0e6dc5;" id="contato"></h4>
+                  <h4 id="result"></h4>
+                  <div class="b">
+                    <button onclick="mostrar_poup(1)" class="add" id="add">Enviar</button>
+                    <button onclick="cancelar()" class="cancel" id="cancel">Cancelar</button>  
+                  </div>
+                  <div class="qr">
+                    <img id="qrcode" style="width: 260px; height: 260px;"/>
+                  </div>
+                </div>
+              </div>
+              <div id="op1" class="espaco">
+                <div class="campo">
+                  <div id="imagePreview2"></div>
+                  <input type="file" id="fileInput2"  name="fileInput" name="imageInput" accept="image/*">
+                  <div id="menssagem2" contenteditable="true" oninput="formatText2(event)" placeholder="Insira sua mensagem"></div>
+                  <p style="text-align: center; size: 20px; color: #00a884;">Delay</p>
+                  <input type="number" id="delay" step="any" placeholder="Segundos" min="0.2" value="7">
+                </div>
+                <div class="botoes">
+                  <h4 class="contato" style="size: 15px; border:1px solid #00a884; padding: 9px; color: #00a884;" id="contato"></h4>
+                  <h4 id="result2"></h4>
+                  <input id="soltar" type="file" id="fileInput" />
+                  <div class="b">
+                    <button onclick="enviar_api(3)" class="add" id="add">Enviar</button>
+                    <button onclick="cancelar()" class="cancel" id="cancel">Cancelar</button>  
+                  </div>
+                  <div class="qr">
+                    <img id="qrcode2" class="qrcode" style="width: 260px; height: 260px;"/>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+    </div>
+    <script>
+      var escolha = 0;
+      var mensage = "";
+      var imagem = "";
+      var mensageM = "";
+      var menssageM2 =""
+      var d =7
+      var xls = null
+      var esperar = false
+      const op1 = document.getElementById("op1")
+      const op2 = document.getElementById("op2")
+      const main = document.getElementById("main")
+      const exl = document.getElementById("soltar")
+      if(escolha ==0){
+        op1.style.display= "none"
+        op2.style.display= "none"
+      }
+
+
+// Função para atualizar a variável global com base no valor do input
+      function selecionar(num){
+        if(num ==1){
+          const icon = document.getElementById("icon")
+          icon.style.fill= "#0e6dc5"
+          main.style.background = "linear-gradient(rgb(55, 55, 218) 36.5% ,#f0f2f5  36.5% 80%)"
+          op1.style.display= "none"
+          op2.style.display= "flex"
+
+        }
+        if(num ==2){
+          const icon = document.getElementById("icon")
+          icon.style.fill= "#00E676"
+          main.style.background = "linear-gradient(green 36.5% ,#f0f2f5  36.5% 80%)"
+          op1.style.display= "flex"
+          op2.style.display= "none"
+        }
+      }
+      const wsUrl = 'ws://localhost:8080';
+      const socket = new WebSocket(wsUrl);
+      socket.binaryType = 'arraybuffer';
+
+      function mostrar_poup(valor){
+        if(valor ==1){
+          document.getElementById("popup").className = "popup show"
+        }
+        if(valor==2){
+          document.getElementById("popup").className = "popup"
+        }
+      }
+      function formatText(event) {
+        const textInput = document.getElementById('menssagem');
+        var digito = event.target.innerText[event.target.innerText.length -1];
+        const text = textInput.innerText;
+        if(digito === "#"){
+          esperar = true
+        }
+        if(esperar === true|| text.includes("#nome")){
+          if(text.includes("#nome")){
+            const parts = text.split(/(\s+)/); // Divide o texto em partes, mantendo os espaços
+            console.log(parts)
+            // Cria um novo conteúdo formatado
+            const formattedText = parts.map(part => {
+                return part.includes('#nome') ? `<span class="hashtag">${part}</span>` : part;
+            }).join('');
+
+            // Atualiza o conteúdo do div
+            textInput.innerHTML = formattedText;
+            placeCaretAtEnd(textInput);
+            esperar = false;
+          }
+        }
+
+        // Coloca o cursor no final
+        mensageM = text // Obtém o texto atual
+      }
+
+      function formatText2(event) {
+        const textInput = document.getElementById('menssagem2');
+        var digito = event.target.innerText[event.target.innerText.length -1];
+        const text = textInput.innerText;
+        if(digito === "#"){
+          esperar = true
+        }
+        if(esperar === true|| text.includes("#nome")){
+          if(text.includes("#nome")){
+            const parts = text.split(/(\s+)/); // Divide o texto em partes, mantendo os espaços
+            console.log(parts)
+            // Cria um novo conteúdo formatado
+            const formattedText = parts.map(part => {
+                return part.includes('#nome') ? `<span class="hashtag">${part}</span>` : part;
+            }).join('');
+
+            // Atualiza o conteúdo do div
+            textInput.innerHTML = formattedText;
+            placeCaretAtEnd(textInput);
+            esperar = false;
+          }
+        }
+
+        // Coloca o cursor no final
+        mensageM2 = text // Obtém o texto atual
+      }
+
+      function placeCaretAtEnd(el) {
+        el.focus();
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false); // Coloca o cursor no final
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+      socket.addEventListener('message', (event) => {
+        const json = JSON.parse(event.data)
+
+        if(json.hasOwnProperty("contato")){
+          console.log(json)
+          document.getElementById("contato").textContent = json.contato + "Restantes"
+          document.getElementById("result").textContent = json.ms
+          document.getElementById("result2").textContent = json.ms
+          document.getElementById("contato").className = "contato show"
+        }
+        if(json.hasOwnProperty("imagem")){
+          document.getElementById("result").textContent = "Escanei o qr code para se conectar"
+          document.getElementById("result2").textContent = "Escanei o qr code para se conectar"
+          const qrcodeContainer = document.getElementById('qrcode');
+          qrcodeContainer.innerHTML = ''; // Limpa QR Code anterior
+          const qrcodeContainer2 = document.getElementById('qrcode2');
+          qrcodeContainer2.innerHTML = ''; // Limpa QR Code anterior
+
+          
+          const qr = qrcode(0, 'L');
+          qr.addData(json.imagem);
+          qr.make();
+          const imgTag = qr.createDataURL(6); // O parâmetro '6' define a escala do QR Code
+
+          // Define o Data URL como o src da imagem
+          qrcodeContainer.src = imgTag;
+          qrcodeContainer2.src = imgTag;
+        }
+        else{
+            document.getElementById("result").textContent = json.ms
+            document.getElementById("result2").textContent = json.ms
+        }
+      });
+
+      socket.addEventListener('close', (event) => {
+        console.log('Conexão fechada');
+        displayMessage('Conexão fechada');
+      });
+    
+      function mudar_menssagem() {
+          var novoValor = document.getElementById("menssagem").value;
+          mensageM = novoValor;
+      }
+      function mudar_menssagem2() {
+          var novoValor = document.getElementById("menssagem2").value;
+          mensageM2 = novoValor;
+      }
+      function mudar_delay(){
+        var novoValor = document.getElementById("delay").value;
+        d = novoValor;
+      }
+      function enviar_api(valor){
+        console.log('Conectado ao servidor WebSocket');
+        document.getElementById("result").textContent = "Gerando QR Code por favor aguarde"
+        document.getElementById("result2").textContent = "Gerando QR Code por favor aguarde"
+
+        if(valor ==1){
+          try{
+            socket.send(JSON.stringify({
+            "status":1,
+            "menssagem":mensageM,
+            "imagem":imagem,
+            "start":1,
+            "d":d
+          }));
+          }catch(err){
+            console.log(err)
+          }
+        }
+        if(valor ==2){
+          try{
+            socket.send(JSON.stringify({
+            "status":1,
+            "menssagem":mensageM,
+            "imagem":imagem,
+            "start":2,
+            "d":d
+          }));
+          }catch(err){
+            console.log(err)
+          }
+        }
+        if(valor ==3){
+          try{
+            socket.send(JSON.stringify({
+            "status":1,
+            "menssagem":mensageM2,
+            "imagem":imagem,
+            "start":3,
+            "d":0.5
+          }));
+          }catch(err){
+            alert(err)
+          }
+        }
+        mostrar_poup(2)
+      }
+      function cancelar(){
+        try{
+          socket.send(JSON.stringify({
+          "status":3,
+        }));
+        }catch(err){
+          console.log(err)
+        }
+        alert("Voce encerrou essa Execusão. Essa aba será fechada. Volte ao projeto e execute novo")
+        window.close()
+      }
+      window.addEventListener('beforeunload', function (e) {
+            // Define a função que será executada ao fechar a página
+            try{
+              socket.send(JSON.stringify({
+              "status":3,
+            }));
+            }catch(err){
+              console.log(err)
+            }            
+            // Mensagem de confirmação (opcional)
+            var confirmationMessage = 'Tem certeza que deseja sair desta página?';
+            (e || window.event).returnValue = confirmationMessage;
+            return confirmationMessage;
+        });
+
+      document.getElementById("menssagem").addEventListener("change", mudar_menssagem);
+      document.getElementById("menssagem2").addEventListener("change", mudar_menssagem2);
+
+      const fileInput = document.getElementById('fileInput');
+      const fileInput2 = document.getElementById('fileInput2');
+      const imagePreview = document.getElementById('imagePreview');
+      const imagePreview2 = document.getElementById('imagePreview2');
+      document.getElementById("delay").addEventListener("change", mudar_delay);
+      exl.addEventListener('change', function() {
+        if(exl.files[0]) {
+          const file = exl.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    xls = reader.result;
+                    const j = {
+                      status:4,
+                      data: arrayBufferToBase64(xls)
+                    }
+                     // Armazena o conteúdo do arquivo
+                     socket.send(JSON.stringify(j))
+                };
+                reader.readAsArrayBuffer(file); // Lê o arquivo como ArrayBuffer
+            }
+        }
+      })
+      fileInput.addEventListener('change', function() {
+        console.log("passou aqui")
+        var novoValor = imagePreview.value;
+        imagem = novoValor;
+  // Verificar se um arquivo foi selecionado
+        console.log(fileInput.files)
+      if (fileInput.files[0]) {
+        // Criar um objeto FileReader
+        const reader = new FileReader();
+        var arrayBuffer = ''
+        // Definir uma função para ser executada quando a leitura do arquivo for concluída
+        reader.onload = function(e) {
+          // Atualizar o background da div de preview com a imagem selecionada
+          imagePreview.style.backgroundImage = `url(${e.target.result})`;
+          const contentType = fileInput.files[0].type;
+            const base64String = event.target.result.split(',')[1]; // Remove 'data:image/png;base64,' prefix
+            const blob = base64ToBlob(base64String, contentType);    
+            blobToArrayBuffer(blob, function(arrayBuffer) {
+                const json = {
+                    status:2,
+                    contentType: contentType,
+                    data: arrayBufferToBase64(arrayBuffer)
+                };
+                // Enviar JSON via WebSocket
+                socket.send(JSON.stringify(json));
+            });          
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      }
+      });
+  
+      fileInput2.addEventListener('change', function() {
+        console.log("passou aqui")
+        var novoValor = imagePreview2.value;
+        imagem = novoValor;
+  // Verificar se um arquivo foi selecionado
+        console.log(fileInput2.files)
+      if (fileInput2.files[0]) {
+        // Criar um objeto FileReader
+        const reader = new FileReader();
+        var arrayBuffer = ''
+        // Definir uma função para ser executada quando a leitura do arquivo for concluída
+        reader.onload = function(e) {
+          // Atualizar o background da div de preview com a imagem selecionada
+          imagePreview2.style.backgroundImage = `url(${e.target.result})`;
+          const contentType = fileInput2.files[0].type;
+            const base64String = event.target.result.split(',')[1]; // Remove 'data:image/png;base64,' prefix
+            const blob = base64ToBlob(base64String, contentType);    
+            blobToArrayBuffer(blob, function(arrayBuffer) {
+                const json = {
+                    status:2,
+                    contentType: contentType,
+                    data: arrayBufferToBase64(arrayBuffer)
+                };
+                // Enviar JSON via WebSocket
+                socket.send(JSON.stringify(json));
+            });          
+        };
+        reader.readAsDataURL(fileInput2.files[0]);
+      }
+      });
+  
+      function base64ToBlob(base64String, contentType) {
+        const byteCharacters = atob(base64String); // Decodifica a string base64
+        const byteArrays = [];
+
+        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+            const slice = byteCharacters.slice(offset, offset + 512);
+            const byteNumbers = new Array(slice.length);
+
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+        }
+
+        return new Blob(byteArrays, { type: contentType });
+    }
+    function blobToArrayBuffer(blob, callback) {
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+            callback(event.target.result);
+        };
+
+        reader.readAsArrayBuffer(blob);
+    }
+
+    function arrayBufferToBase64(arrayBuffer) {
+        const bytes = new Uint8Array(arrayBuffer);
+        let binaryString = '';
+
+        for (let i = 0; i < bytes.byteLength; i++) {
+            binaryString += String.fromCharCode(bytes[i]);
+        }
+
+        return btoa(binaryString);
+    }
+    </script>
+    <style>
+        @font-face {
+          font-family: "Helvica";
+          src: url("./font/HelveticaNeueThin.otf");
+          font-weight: 100;
+        }
+        @font-face {
+          font-family: "Helvica";
+          src: url("./font/HelveticaNeueMedium.otf");
+          font-weight: 300;
+        }
+        @font-face {
+          font-family: "Helvica";
+          src: url("./font/HelveticaNeueRoman.otf");
+          font-weight: 200;
+        }
+        .escolha{
+          padding: 12px 12px;
+          width: 30%;
+          height: auto;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .escolha button{
+          width: auto;
+          padding: 10px 23px;
+          border-radius: 12px;
+          border: none;
+          color: white;
+        }
+        .escolha button:nth-child(1){
+          background: rgb(55, 55, 218);
+        }
+        .escolha button:nth-child(1):hover{
+          cursor: pointer;
+          background: white;
+          outline: 1px solid rgb(55, 55, 218);
+          color: rgb(55, 55, 218);
+        }
+        .escolha button:nth-child(2){
+          background: green;
+        }
+        .escolha button:nth-child(2):hover{
+          cursor: pointer;
+          background: white;
+          outline: 1px solid green;
+          color: green;
+        }
+        input[type="file"]::file-selector-button {
+          border: 2px solid #ccc; /* Estilizando as bordas */
+          border-radius: 4px; /* Arredondando as bordas */
+          padding: 8px 15px; /* Ajustando o padding */
+          background-color: #e0e0e0; /* Cor de fundo */
+          cursor: pointer; /* Mostrando o cursor de mão ao passar o mouse */
+        }
+        .b{
+          width: 60%;
+          display: flex;
+          justify-content: space-between;
+          height: auto;
+        }
+        #imagePreview, #imagePreview2{
+          background-size: 100% 100%;
+          width: 30%;
+          height: 100px;
+        }
+        
+        input[type="number"]::-webkit-outer-spin-button, 
+        input[type="number"]::-webkit-inner-spin-button{
+          opacity: 1; /* Torna as setas visíveis */
+          height: auto; /* Ajusta a altura */
+          width: auto; /* Ajusta a largura */
+          color: #333; /* Define a cor das setas */
+        }
+        input[type="number"]{
+          text-align: center;
+          color: #41525d;
+          font-size: 15px;
+          border: none;
+          outline: none;
+          background: transparent;
+          width: 60px;
+        }
+        #menssagem,#menssagem2{
+          color: #41525d;
+          background: white;
+          overflow-y: auto;
+          padding: 10px;
+          height: 200px;
+          width: 80%;
+          border: 1px solid #ccc;
+          padding: 10px;
+          font-size: 16px;
+          outline: none; /* Remove o contorno */
+          white-space: pre-wrap; /* Preserva quebras de linha */
+          overflow-wrap: break-word; /* Quebra palavras longas */
+        }
+        .espaco{
+          height: 90%;
+          width: 80%;
+          display: flex;
+        }
+        .botoes{
+          width: 50%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .main {
+          overflow-y: auto;
+          position: absolute;
+          z-index: 1;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(#00a884 36.5% ,#f0f2f5  36.5% 80%);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+        }
+        .linha{
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          width: 75%;
+          height: auto;
+        }
+        .popup.show{
+          display: flex;
+        }
+        .popup{
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          display: none;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0, 0, 0, 0.404);
+        }
+        .menu{
+          width:500px;
+          height: 300px;
+          background: white;
+          border-radius: 20px;
+          padding: 10px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+        .menu_{
+          display: flex;
+          padding-bottom: 15px;
+          flex-direction: column;
+          align-items: center;
+          min-height: 600px;
+          width: 100%;
+          background: white;
+          box-shadow: 0 17px 50px 0 rgba(11, 20, 26, .19), 0 12px 15px 0 rgba(11, 20, 26, .24);
+        }
+        .menu_ .campo{
+          align-items: center;
+          justify-content: space-evenly;
+          flex-direction: column;
+          display: flex;
+          border-radius: 30px;
+          border: 0.5px solid #d1d7db;
+          background: #f0f2f5;
+          height: 100%;
+          width: 50%;
+        }
+        .menu_ .campo input{
+          width: 50%;
+        }
+        #op2 .add{
+          background: blue;
+        }
+        #op1 .add{
+          background: #00a884;
+        }
+        .cancel{
+          background: rgb(199, 19, 19);
+        }
+         .add:hover{
+          color: #00a884;
+          border: 1px solid #00a884;
+        }
+        .cancel:hover{
+          color: rgb(199, 19, 19);
+          border: 1px solid rgb(199, 19, 19);
+        }
+        .add,  .cancel{
+          color: white;
+          border: none;
+          width: 120px;
+          height: 70px;
+          font-size: 20px;
+        }
+         .add:hover, .cancel:hover{
+          background: white;
+          cursor: pointer;
+        }
+        .menu_ h3{
+          text-align: center;
+          font-size: 16px;
+          font-weight: 200;
+          color: #3b4a54;
+          margin: 20px;
+        }
+        #soltar{
+          width: 60%;
+        }
+        .menu_ .insert{
+          margin-top: 30px;
+          font-size: 28px;
+          font-weight: 100;
+          color: #41525d;
+        }
+        .nome p{
+          font-weight: 200;
+          font-size: 13px;
+          margin-left: 10px;
+        }
+        .nome{
+          margin: 10px;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        #result,#result2{
+        text-align: center;
+          margin: 10px;
+          font-size: 30px;
+        }
+        #result{
+          color: blue;
+        }
+        #result2{
+          color: green;
+        }
+        .contato{
+          display: none;
+        }
+        .contato.show{
+          display: flex;
+        }
+        * {
+          transition: all 0.2s ease-in-out;
+          font-family: "circular";
+          font-weight: 200;
+          box-sizing: border-box;
+          padding: 0;
+          margin: 0;
+        }
+        .hashtag {
+            color: green; /* Define a cor verde para o texto com '#' */
+        }
+        
+        @media screen and (min-width:1800px) {
+            .menu_{
+                width: 1200px;
+            }
+        }
+
+
+    </style>
+</body>
+
+</html>
