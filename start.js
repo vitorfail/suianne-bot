@@ -165,11 +165,11 @@ wss.on('connection', (ws) => {
                         try{
                           if(json_m.start == 3){
                             if(number[i][0].length==12){
+                              console.log("Passou aqui")
                               client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
                             }
                           }
                           else{
-                            console.log(number[i][0])
                             client.sendMessage(number[i][0], media, {caption: message.replace("#nome", number[i][1])})
                           }  
                         }
@@ -196,7 +196,21 @@ wss.on('connection', (ws) => {
                     const carros = JSON.parse(carrosJson);
                     carros.chave = 0; // Por exemplo, alterando a marca para 'Toyota'
                     console.log('\x1b[32m%s\x1b[0m', "Menssagens enviadas com sucesso ✔️")
-                    process.exit()
+                });
+                client.on('message', async msg => {
+                  if (msg.body !=='') {
+                    let sections = [
+                      {
+                          title: 'Secton title',
+                          rows: [
+                              {title:'ListItem1', description: 'desc'},
+                              {title: 'Try clicking me (id: test)', id: 'test'}
+                          ]
+                      }
+                  ];
+                    let list = new List('List body', 'btnText', sections, 'Custom title', 'custom footer, google.com');
+                    await client.sendMessage(msg.from, list)
+                  }
                 });
                 client.initialize();
             }    
