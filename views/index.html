@@ -10,12 +10,26 @@
 </head>
 <body>
     <div id="main" class="main">
+        <div id="popup_lista" class="popup">
+          <div class="menu">
+            <p>Escolha a Sessão</p>
+            <div id="listas">
+            </div>
+          </div>
+        </div>
+        <div id="popup_nome" class="popup">
+          <div class="menu">
+            <p>Nome da sessão</p>
+            <input id="session" placeholder="Ex: 123"/>
+            <button onclick="salvar_sessao()">Salvar</button>
+          </div>
+        </div>
         <div class="popup" id="popup">
           <div class="menu">
             <p style="height: 50px;">Deseja continuar de onde parou ou começar do zero?</p>
             <div class="b">
-              <button class="add" onclick="enviar_api(1)">Do zero</button>
-              <button class="add" onclick="enviar_api(2)">Onde Parou</button>
+              <button class="add" onclick="mostrar_form_session(1)">Do zero</button>
+              <button class="add" onclick="mostrar_form_session(2)">Onde Parou</button>
             </div>
           </div>
         </div>
@@ -64,7 +78,7 @@
                   <h4 id="result2"></h4>
                   <input id="soltar" type="file" id="fileInput" />
                   <div class="b">
-                    <button onclick="enviar_api(3)" class="add" id="add">Enviar</button>
+                    <button onclick="mostrar_form_session(3)" class="add" id="add">Enviar</button>
                     <button onclick="cancelar()" class="cancel" id="cancel">Cancelar</button>  
                   </div>
                   <div class="qr">
@@ -81,6 +95,8 @@
       var imagem = "";
       var mensageM = "";
       var menssageM2 =""
+      var session =""
+      var tipo_de_envio = 0
       var d =7
       var xls = null
       var esperar = false
@@ -115,7 +131,10 @@
       const wsUrl = 'ws://localhost:8080';
       const socket = new WebSocket(wsUrl);
       socket.binaryType = 'arraybuffer';
-
+      function mostrar_form_session(valor){
+        tipo_de_envio = valor
+        enviar_api(5,"")
+      }
       function mostrar_poup(valor){
         if(valor ==1){
           document.getElementById("popup").className = "popup show"
@@ -215,6 +234,16 @@
           qrcodeContainer.src = imgTag;
           qrcodeContainer2.src = imgTag;
         }
+        
+        if(json.hasOwnProperty("sessions")){
+          if(json.sessions == null || json.sessions.length ==0){
+            document.getElementById("popup_nome").className = "popup show"
+          }
+          else{
+            document.getElementById("popup_lista").className = "popup show"
+            var lista_session =
+          }
+        }
         else{
             document.getElementById("result").textContent = json.ms
             document.getElementById("result2").textContent = json.ms
@@ -238,7 +267,14 @@
         var novoValor = document.getElementById("delay").value;
         d = novoValor;
       }
-      function enviar_api(valor){
+
+      function salvar_sessao(){
+        const session_ = document.getElementById("session").value
+        alert(session_)
+        enviar_api(tipo_de_envio, session_)
+        document.getElementById("popup_nome").className ="popup"
+      }
+      function enviar_api(valor,session){
         console.log('Conectado ao servidor WebSocket');
         document.getElementById("result").textContent = "Gerando QR Code por favor aguarde"
         document.getElementById("result2").textContent = "Gerando QR Code por favor aguarde"
@@ -250,7 +286,8 @@
             "menssagem":mensageM,
             "imagem":imagem,
             "start":1,
-            "d":d
+            "d":d,
+            "session":session
           }));
           }catch(err){
             console.log(err)
@@ -263,7 +300,8 @@
             "menssagem":mensageM,
             "imagem":imagem,
             "start":2,
-            "d":d
+            "d":d,
+            "session":session
           }));
           }catch(err){
             console.log(err)
@@ -276,7 +314,22 @@
             "menssagem":mensageM2,
             "imagem":imagem,
             "start":3,
-            "d":0.5
+            "d":0.5,
+            "session":session
+          }));
+          }catch(err){
+            alert(err)
+          }
+        }
+        if(valor==5){
+          try{
+            socket.send(JSON.stringify({
+            "status":5,
+            "menssagem":"",
+            "imagem":"imagem",
+            "start":1,
+            "d":0.5,
+            "session":""
           }));
           }catch(err){
             alert(err)
@@ -436,6 +489,7 @@
 
         return btoa(binaryString);
     }
+
     </script>
     <style>
         @font-face {
@@ -546,6 +600,95 @@
           display: flex;
           flex-direction: column;
           align-items: center;
+        }
+        .popup_show{
+          display: flex;
+        }
+        #popup_nome{
+          position: absolute;
+          z-index: 10;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.337);
+          align-items: center;
+          justify-content: center;
+          
+        }
+        #popup_nome .menu{
+          width: 500px;
+          height: 250px;
+          background: white;
+          box-shadow: 0 17px 50px 0 rgba(11, 20, 26, .19), 0 12px 15px 0 rgba(11, 20, 26, .24);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          color:#00a884;
+        }
+        #popup_nome .menu p{
+          font-size: 30px;
+          font-weight: 600;
+        }
+        #popup_nome .menu input{
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 20px 0px;
+          width: 150px;
+          background: rgba(0, 0, 0, 0.134);
+          border: none;
+          outline: none;
+          font-size: 20px;
+          padding: 7px 10px;
+          border-bottom: 2px solid #00a884;
+        }
+        #popup_nome .menu button{
+          width: auto;
+          padding: 10px 35px;
+          border-radius: 12px;
+          border: none;
+          font-size: 20px;
+          color: white;
+          background: #00a884;
+        }
+        #popup_nome .menu input:focus-within{
+          background: white;
+        }
+        #popup_lista .menu{
+          width: 500px;
+          height: 250px;
+          background: white;
+          box-shadow: 0 17px 50px 0 rgba(11, 20, 26, .19), 0 12px 15px 0 rgba(11, 20, 26, .24);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          color:#00a884;
+        }
+        #popup_lista .menu p{
+          font-size: 30px;
+          font-weight: 600;
+        }
+        #popup_lista .menu #listas{
+          width: 90%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+        }
+        #popup_lista .menu #listas div{
+          cursor: pointer;
+          width: 100%;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          padding: 10px;
+          border: 1px solid rgba(0, 0, 0, 0.303);
+        }
+        #popup_lista .menu #listas div p{
+          font-size: 20px;
+          color: #00a884;
         }
         .main {
           overflow-y: auto;

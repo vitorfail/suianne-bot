@@ -1,4 +1,4 @@
-const { Client,MessageMedia } = require('whatsapp-web.js');
+const { Client,MessageMedia , LocalAuth,LegacySessionAuth} = require('whatsapp-web.js');
 const QRCode = require('qrcode');
 const fs = require('fs');
 const WebSocket = require('ws');
@@ -8,7 +8,6 @@ const path = require('path');
 const XLSX = require('xlsx');
 require('dotenv').config();
 
-const client = new Client();
 var contacts = []
 var start = false
 
@@ -89,20 +88,28 @@ wss.on('connection', (ws) => {
           if(json_m.start== 1){
             ws.send(JSON.stringify({ms:"Gerando o QR code Aguarde..."}) );
             const imagePath = path.join(__dirname, 'imagem', 'image1.png');
-            await suianne(json_m.menssagem, json_m.d, imagePath, 0,1)
+            await suianne(json_m.menssagem, json_m.d, imagePath, 0,1, null)
           }
           if(json_m.start ==2){
             ws.send(JSON.stringify({ms:"Vamos enviar de onde parou.\nSe Conecte no Whatsapp Web..."}) );
             const imagePath = path.join(__dirname, 'imagem', 'image1.png');
-            await suianne(json_m.menssagem, json_m.d, imagePath, json_numero, 1)
+            await suianne(json_m.menssagem, json_m.d, imagePath, json_numero, 1, null)
           }
           if(json_m.start == 3){
             ws.send(JSON.stringify({ms:"Gerando o QR code Aguarde..."}) );
             const imagePath = path.join(__dirname, 'imagem', 'image1.png');
-            await suianne(json_m.menssagem, json_m.d, "", 0, 0)
+            await suianne(json_m.menssagem, json_m.d, "", 0, 0,null)
           }
-            
-            async function suianne(mensagem, d, imagem, index_, pass){
+          if(json_m.start == 5){
+            ws.send(JSON.stringify({ms:"Gerando o QR code Aguarde..."}) );
+            const imagePath = path.join(__dirname, 'imagem', 'image1.png');
+            await suianne(json_m.menssagem, json_m.d, "", 0, 0, json_m.session)
+          }
+
+            async function suianne(mensagem, d, imagem, index_, pass, session){
+              const auth = session?{authStrategy: new LocalAuth({clientId: json_m.session })}:{}
+              const client = await new Client(auth);
+              console.log("original")  
               client.on('qr', (qr) => {
                   // Generate and scan this code with your phone
                   // Dados a serem codificados no QR Code
@@ -293,6 +300,16 @@ wss.on('connection', (ws) => {
     } catch (err) {
         console.error('Erro ao processar o arquivo Excel', err);
     }
+    }
+    if(json_m.status ==5){
+      const arquivos = fs.readdirSync(".wwebjs_auth");
+
+      // Filtra e exibe apenas as pastas
+      const pastas = arquivos.filter(arquivo => fs.statSync(path.join(".wwebjs_auth", arquivo)).isDirectory());
+    
+      // Exibe as pastas encontradas
+      console.log('Pastas encontradas:', pastas);
+      ws.send(JSON.stringify({sessions:pastas}) );
     }
   });
 
