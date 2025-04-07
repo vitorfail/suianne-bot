@@ -107,32 +107,42 @@ wss.on('connection', (ws) => {
           }
 
             async function suianne(mensagem, d, imagem, index_, pass, session){
-              const auth = session?{authStrategy: new LocalAuth({clientId: json_m.session })}:{}
+              const SESSION_FILE_PATH = './sessions';
+              // Load the session data if it has been previously saved
+              let sessionData;
+              if(fs.existsSync(SESSION_FILE_PATH+"/"+json_m.session+".json")) {
+                  sessionData = require(SESSION_FILE_PATH+"/"+json_m.session+".json");
+              }
+              const auth = session?{authStrategy: new LocalAuth({session: sessionData})}:{authStrategy: new LocalAuth()}
               const client = await new Client(auth);
-              console.log("original")  
-              client.on('qr', (qr) => {
-                  // Generate and scan this code with your phone
-                  // Dados a serem codificados no QR Code
-                  const data = qr;
-                  // Opções de configuração
-                  const options = {
-                  errorCorrectionLevel: 'L', // Nível de correção de erro
-                  type: 'image/png', // Tipo de imagem
-                  quality: 1, // Qualidade da imagem
-                  margin: 1 // Margem ao redor do código QR
-                  };
-                  // Gera o QR Code
-                  console.log("registro1")
-                  QRCode.toFile('./qrcode.png', data, options, (err) => {
-                  if (err) {
-                      console.error('Erro ao gerar o QR Code:', err);
-                  } else {
-                      console.log('QR Code gerado com sucesso!');
-                      ws.send(JSON.stringify({"imagem": qr}));
-                  }
+                if(session==null){ 
+                console.log(json_m.session+" "+" "+json_m.start) 
+                client.on('qr', (qr) => {
+                    // Generate and scan this code with your phone
+                    // Dados a serem codificados no QR Code
+                    const data = qr;
+                    // Opções de configuração
+                    const options = {
+                    errorCorrectionLevel: 'L', // Nível de correção de erro
+                    type: 'image/png', // Tipo de imagem
+                    quality: 1, // Qualidade da imagem
+                    margin: 1 // Margem ao redor do código QR
+                    };
+                    // Gera o QR Code
+                    console.log("registro1")
+                    QRCode.toFile('./qrcode.png', data, options, (err) => {
+                    if (err) {
+                        console.error('Erro ao gerar o QR Code:', err);
+                    } else {
+                        console.log('QR Code gerado com sucesso!');
+                        ws.send(JSON.stringify({"imagem": qr}));
+                    }
+                    });
                   });
-                });
+                }
+                console.log("iniciando")
                 client.on('ready', async() => {
+                  console.log("comecou")
                     const listas_numeros = await fs.readFileSync('lista.json')
                     var c  = JSON.parse(listas_numeros)
   
@@ -204,21 +214,13 @@ wss.on('connection', (ws) => {
                     carros.chave = 0; // Por exemplo, alterando a marca para 'Toyota'
                     console.log('\x1b[32m%s\x1b[0m', "Menssagens enviadas com sucesso ✔️")
                 });
-                client.on('message', async msg => {
-                  if (msg.body !=='') {
-                    let sections = [
-                      {
-                          title: 'Secton title',
-                          rows: [
-                              {title:'ListItem1', description: 'desc'},
-                              {title: 'Try clicking me (id: test)', id: 'test'}
-                          ]
+                /*client.on('authenticated', async (s) => {
+                  fs.writeFile("./session.json", JSON.stringify(s), (err) => {
+                      if (err) {
+                          console.error(err);
                       }
-                  ];
-                    let list = new List('List body', 'btnText', sections, 'Custom title', 'custom footer, google.com');
-                    await client.sendMessage(msg.from, list)
-                  }
-                });
+                  });
+                });*/
                 client.initialize();
             }    
         }
@@ -302,10 +304,10 @@ wss.on('connection', (ws) => {
     }
     }
     if(json_m.status ==5){
-      const arquivos = fs.readdirSync(".wwebjs_auth");
+      const arquivos = fs.readdirSync("sessions");
 
       // Filtra e exibe apenas as pastas
-      const pastas = arquivos.filter(arquivo => fs.statSync(path.join(".wwebjs_auth", arquivo)).isDirectory());
+      const pastas = arquivos.filter(arquivo => fs.statSync(path.join("sessions", arquivo)).isDirectory());
     
       // Exibe as pastas encontradas
       console.log('Pastas encontradas:', pastas);

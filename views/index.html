@@ -241,7 +241,11 @@
           }
           else{
             document.getElementById("popup_lista").className = "popup show"
-            var lista_session =
+            var lista_session = json.sessions
+            const divs = lista_session.map(part => {
+                return `<div onclick="enviar_api(6,'${part}')"><p>${part}</p></div>`;
+            }).join('');
+            document.getElementById("listas").innerHTML = divs
           }
         }
         else{
@@ -328,6 +332,21 @@
             "menssagem":"",
             "imagem":"imagem",
             "start":1,
+            "d":0.5,
+            "session":""
+          }));
+          }catch(err){
+            alert(err)
+          }
+        }
+        if(valor==6){
+          alert("passou aqui")
+          try{
+            socket.send(JSON.stringify({
+            "status":1,
+            "menssagem":"",
+            "imagem":"imagem",
+            "start":5,
             "d":0.5,
             "session":""
           }));
