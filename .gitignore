@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/.wwebjs_auth/session
 /.pnp
 .pnp.js
 .yarn/install-state.gz

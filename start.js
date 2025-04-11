@@ -116,7 +116,6 @@ wss.on('connection', (ws) => {
               const auth = session?{authStrategy: new LocalAuth({session: sessionData})}:{authStrategy: new LocalAuth()}
               const client = await new Client(auth);
                 if(session==null){ 
-                console.log(json_m.session+" "+" "+json_m.start) 
                 client.on('qr', (qr) => {
                     // Generate and scan this code with your phone
                     // Dados a serem codificados no QR Code
@@ -129,7 +128,6 @@ wss.on('connection', (ws) => {
                     margin: 1 // Margem ao redor do código QR
                     };
                     // Gera o QR Code
-                    console.log("registro1")
                     QRCode.toFile('./qrcode.png', data, options, (err) => {
                     if (err) {
                         console.error('Erro ao gerar o QR Code:', err);
@@ -142,7 +140,6 @@ wss.on('connection', (ws) => {
                 }
                 console.log("iniciando")
                 client.on('ready', async() => {
-                  console.log("comecou")
                     const listas_numeros = await fs.readFileSync('lista.json')
                     var c  = JSON.parse(listas_numeros)
   
@@ -182,7 +179,6 @@ wss.on('connection', (ws) => {
                         try{
                           if(json_m.start == 3){
                             if(number[i][0].length==12){
-                              console.log("Passou aqui")
                               client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
                             }
                           }
@@ -279,7 +275,6 @@ wss.on('connection', (ws) => {
                 }
                 else{
                   var numero_teste = element[ele].toString().replace(/\D+/g, '')
-                  console.log(numero_teste)
                   if(numero_teste.length ==10){
                     let posicao = numero_teste.length - 8 ; // Posição após o 8º dígito da direita
                     let resultado = numero_teste.slice(0, posicao) + '9' + numero_teste.slice(posicao);
@@ -287,6 +282,13 @@ wss.on('connection', (ws) => {
                   }
                   else{
                   }
+                }
+              }
+            }
+            else{
+              if((element[ele].toString().replace(/\D+/g, '')).length >7){
+                if((element[ele].toString().replace(/\D+/g, '')).length ==12||(element[ele].toString().replace(/\D+/g, '')).length ==13){
+                  x.push([element[ele].toString().replace(/\D+/g, ''), element[ele2]])
                 }
               }
             }
@@ -310,7 +312,6 @@ wss.on('connection', (ws) => {
       const pastas = arquivos.filter(arquivo => fs.statSync(path.join("sessions", arquivo)).isDirectory());
     
       // Exibe as pastas encontradas
-      console.log('Pastas encontradas:', pastas);
       ws.send(JSON.stringify({sessions:pastas}) );
     }
   });
