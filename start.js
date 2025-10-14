@@ -138,7 +138,9 @@ wss.on('connection', (ws) => {
                     });
                   });
                 }
-                console.log("iniciando")
+                client.on("authenticated", async() => {
+                    ws.send(JSON.stringify({ms:"Você logou com sucesso"}) );
+                })
                 client.on('ready', async() => {
                     const listas_numeros = await fs.readFileSync('lista.json')
                     var c  = JSON.parse(listas_numeros)
@@ -177,14 +179,21 @@ wss.on('connection', (ws) => {
                           "image/png",fileData,"image"
                         )
                         try{
-                          if(json_m.start == 3){
-                            if(number[i][0].length==12){
-                              client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
-                            }
+
+                            if(json_m.start == 3){
+                              if(number[i][0].length==12){
+                                if(mensagem != ""){
+                                  client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
+                                }
+                                else{
+                                  client.send
+                                }
+                              }
+                            else{
+                              client.sendMessage(number[i][0], media, {caption: message.replace("#nome", number[i][1])})
+                            } 
                           }
-                          else{
-                            client.sendMessage(number[i][0], media, {caption: message.replace("#nome", number[i][1])})
-                          }  
+
                         }
                         catch(err){
                           console.log("Deu o sguinte erro:"+err)
@@ -263,37 +272,89 @@ wss.on('connection', (ws) => {
         const worksheet = workbook.Sheets[sheetName];
         const data = XLSX.utils.sheet_to_json(worksheet);
         var x = []
-        data.forEach(element=> {
-          var ele = Object.keys(element)[0]
-          var ele2 = Object.keys(element)[1]
-          if(element[ele].toString().startsWith('0800')==false){
-            if((element[ele].toString().replace(/\D+/g, '')).startsWith("55") == false){
-              if((element[ele].toString().replace(/\D+/g, '')).length >7){
-                if((element[ele].toString().replace(/\D+/g, '')).length == 10){
-                  var feito = element[ele].toString().replace(/\D+/g, '') 
-                  x.push(["55"+feito,element[ele2]])
-                }
-                else{
-                  var numero_teste = element[ele].toString().replace(/\D+/g, '')
-                  if(numero_teste.length ==10){
-                    let posicao = numero_teste.length - 8 ; // Posição após o 8º dígito da direita
-                    let resultado = numero_teste.slice(0, posicao) + '9' + numero_teste.slice(posicao);
-                    x.push(["55"+resultado, element[ele2]])
-                  }
-                  else{
-                  }
-                }
-              }
+        data.forEach(element => {
+            const chaves = Object.keys(element);
+            const numeroOriginal = element[chaves[0]].toString();
+            const valorAssociado = element[chaves[1]];
+            
+            // Remove todos os caracteres não numéricos
+            const numeroLimpo = numeroOriginal.replace(/\D+/g, '');
+            
+            // Pula números que começam com 0800
+            if (numeroLimpo.startsWith('0800')) {
+                return;
             }
-            else{
-              if((element[ele].toString().replace(/\D+/g, '')).length >7){
-                if((element[ele].toString().replace(/\D+/g, '')).length ==12||(element[ele].toString().replace(/\D+/g, '')).length ==13){
-                  x.push([element[ele].toString().replace(/\D+/g, ''), element[ele2]])
-                }
-              }
+            
+            let numeroFormatado;
+            
+            // Se o número já começa com 55
+            if (numeroLimpo.startsWith('55')) {
+                numeroFormatado = formatarNumeroCom55(numeroLimpo);
+            } 
+            // Se o número não começa com 55
+            else {
+                numeroFormatado = formatarNumeroSem55(numeroLimpo);
             }
-          }
-        })
+            
+            // Adiciona à lista apenas se o número foi formatado com sucesso (12 dígitos: 55 + 10)
+            if (numeroFormatado && numeroFormatado.length === 12) {
+                x.push([numeroFormatado, valorAssociado]);
+            }
+        });
+
+        function formatarNumeroCom55(numero) {
+            // Remove o '55' do início
+            const sem55 = numero.substring(2);
+            
+            // Se tem 11 dígitos após o 55 (DDD + 9 + 8), remove o 9
+            if (sem55.length === 11) {
+                const ddd = sem55.substring(0, 2);
+                const resto = sem55.substring(2);
+                // Remove o 9 se estiver na primeira posição
+                if (resto.startsWith('9')) {
+                    return '55' + ddd + resto.substring(1);
+                }
+            }
+            
+            // Se tem 10 dígitos após o 55 (DDD + 8), já está correto
+            if (sem55.length === 10) {
+                return '55' + sem55;
+            }
+            
+            return null;
+        }
+
+        function formatarNumeroSem55(numero) {
+            // Se tem 11 dígitos (DDD + 9 + 8), remove o 9
+            if (numero.length === 11) {
+                const ddd = numero.substring(0, 2);
+                const resto = numero.substring(2);
+                // Remove o 9 se estiver na primeira posição
+                if (resto.startsWith('9')) {
+                    return '55' + ddd + resto.substring(1);
+                }
+            }
+            
+            // Se tem 10 dígitos (DDD + 8), apenas adiciona o 55
+            if (numero.length === 10) {
+                return '55' + numero;
+            }
+            
+            // Se tem 9 dígitos (sem DDD), assume um DDD padrão ou descarta
+            if (numero.length === 9) {
+                // Aqui você pode definir um DDD padrão ou tratar como erro
+                // Exemplo: assumindo DDD 11 para São Paulo
+                return '5511' + numero;
+            }
+            
+            // Para números com mais de 11 dígitos, pega os últimos 10
+            if (numero.length > 11) {
+                const ultimos10 = numero.substring(numero.length - 10);
+                return '55' + ultimos10;
+            }
+            
+            return null;
+        }     
         const listas = fs.readFileSync('lista.json');
         const c = JSON.parse(listas);
         console.log(x)

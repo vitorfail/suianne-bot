@@ -274,7 +274,6 @@
 
       function salvar_sessao(){
         const session_ = document.getElementById("session").value
-        alert(session_)
         enviar_api(tipo_de_envio, session_)
         document.getElementById("popup_nome").className ="popup"
       }
@@ -322,7 +321,6 @@
             "session":session
           }));
           }catch(err){
-            alert(err)
           }
         }
         if(valor==5){
@@ -336,11 +334,9 @@
             "session":""
           }));
           }catch(err){
-            alert(err)
           }
         }
         if(valor==6){
-          alert("passou aqui")
           try{
             socket.send(JSON.stringify({
             "status":1,
@@ -351,7 +347,6 @@
             "session":""
           }));
           }catch(err){
-            alert(err)
           }
         }
         mostrar_poup(2)
@@ -364,7 +359,6 @@
         }catch(err){
           console.log(err)
         }
-        alert("Voce encerrou essa Execusão. Essa aba será fechada. Volte ao projeto e execute novo")
         window.close()
       }
       window.addEventListener('beforeunload', function (e) {
