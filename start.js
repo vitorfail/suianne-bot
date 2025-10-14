@@ -163,14 +163,11 @@ wss.on('connection', (ws) => {
                     const index = number.length
                     const delay_ = d*1000
                     var tempo_total = d*index -json_numero                
-                    function tempo(milissegundos){
-                        var horas = Math.floor(milissegundos / 3600);
-                        segundos %= 3600;
-                        var minutos = Math.floor((milissegundos% 3600) / 60);
-                        var segundos = milissegundos % 60;
-                        return horas+ " horas, "+minutos +" minutos, "+segundos+" segundos"
+                    function tempo(contatos_evniados){
+                      return contatos_evniados;
+                      
                     }
-                    ws.send(JSON.stringify({"contato": contacts.length+ " Contatos",ms:"Tempo estimado "+tempo(d*index)}) );
+                    ws.send(JSON.stringify({"contato": contacts.length+ " Contatos",ms:"Contatos Enviados "+index}) );
                     for(let i = index_ ==0?0:index_; i<index; i++){                    
                         const fileData = fs.readFileSync("image1.png", {
                           encoding: 'base64',
@@ -209,7 +206,7 @@ wss.on('connection', (ws) => {
                         fs.writeFileSync('dados.json', novoJson);
     
                         tempo_total = tempo_total - d
-                        ws.send(JSON.stringify({"contato": (contacts.length -(i+1))+ " Contatos " ,ms:"Tempo restante " +tempo(tempo_total)}) );
+                        ws.send(JSON.stringify({"contato": (contacts.length -(i+1))+ " Contatos " ,ms:"Mensssagens Enviados: " +i}) );
                         console.log(i)
                         await new Promise(resolve => setTimeout(resolve, delay_));
                     }
