@@ -179,15 +179,14 @@ wss.on('connection', (ws) => {
 
                             if(json_m.start == 3){
                               if(number[i][0].length==12){
-                                if(mensagem != ""){
+                                if(mensagem != ""){                                  
                                   client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
                                 }
                                 else{
-                                  client.send
                                 }
                               }
                             else{
-                              client.sendMessage(number[i][0], media, {caption: message.replace("#nome", number[i][1])})
+                              client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
                             } 
                           }
 
@@ -269,89 +268,97 @@ wss.on('connection', (ws) => {
         const worksheet = workbook.Sheets[sheetName];
         const data = XLSX.utils.sheet_to_json(worksheet);
         var x = []
+        const dddsComNove = new Set([11,12,13,14,15,16,17,18,19,21,22,24,27,28]);
         data.forEach(element => {
             const chaves = Object.keys(element);
             const numeroOriginal = element[chaves[0]].toString();
             const valorAssociado = element[chaves[1]];
             
-            // Remove todos os caracteres não numéricos
             const numeroLimpo = numeroOriginal.replace(/\D+/g, '');
-            
-            // Pula números que começam com 0800
-            if (numeroLimpo.startsWith('0800')) {
-                return;
-            }
-            
+
+            if (numeroLimpo.startsWith('0800')) return;
+
             let numeroFormatado;
-            
-            // Se o número já começa com 55
+
             if (numeroLimpo.startsWith('55')) {
                 numeroFormatado = formatarNumeroCom55(numeroLimpo);
-            } 
-            // Se o número não começa com 55
-            else {
+            } else {
                 numeroFormatado = formatarNumeroSem55(numeroLimpo);
             }
-            
-            // Adiciona à lista apenas se o número foi formatado com sucesso (12 dígitos: 55 + 10)
-            if (numeroFormatado && numeroFormatado.length === 12) {
+            console.log(numeroFormatado);
+            if (numeroFormatado && numeroFormatado.length === 12 || numeroFormatado && numeroFormatado.length === 13) {
                 x.push([numeroFormatado, valorAssociado]);
             }
         });
 
+
+        /* ------------ FORMATA COM 55 ------------ */
+
         function formatarNumeroCom55(numero) {
-            // Remove o '55' do início
-            const sem55 = numero.substring(2);
-            
-            // Se tem 11 dígitos após o 55 (DDD + 9 + 8), remove o 9
+            const sem55 = numero.substring(2); // remove o 55
+            const ddd = parseInt(sem55.substring(0, 2));
+            const resto = sem55.substring(2);
+
+            // CASO 1: número com 11 dígitos (DDD + 9 + 8)
             if (sem55.length === 11) {
-                const ddd = sem55.substring(0, 2);
-                const resto = sem55.substring(2);
-                // Remove o 9 se estiver na primeira posição
                 if (resto.startsWith('9')) {
-                    return '55' + ddd + resto.substring(1);
+                    // Só remove o 9 se o DDD não deveria ter 9
+                    if (!dddsComNove.has(ddd)) {
+                        return '55' + ddd + resto.substring(1);
+                    }
+                    // Se o DDD exige 9, mantém como está
+                    return '55' + sem55;
                 }
             }
-            
-            // Se tem 10 dígitos após o 55 (DDD + 8), já está correto
+
+            // CASO 2: número com 10 dígitos (DDD + 8)
             if (sem55.length === 10) {
+                // Se o DDD exige 9 e não tem 9 → adiciona
+                if (dddsComNove.has(ddd) && !resto.startsWith('9')) {
+                    return '55' + ddd + '9' + resto;
+                }
                 return '55' + sem55;
             }
-            
+
             return null;
         }
-
+        /* ------------ FORMATA SEM 55 ------------ */
         function formatarNumeroSem55(numero) {
-            // Se tem 11 dígitos (DDD + 9 + 8), remove o 9
+            const ddd = parseInt(numero.substring(0, 2));
+            const resto = numero.substring(2);
+
+            // CASO 1: número com 11 dígitos (DDD + 9 + 8)
             if (numero.length === 11) {
-                const ddd = numero.substring(0, 2);
-                const resto = numero.substring(2);
-                // Remove o 9 se estiver na primeira posição
                 if (resto.startsWith('9')) {
-                    return '55' + ddd + resto.substring(1);
+                    if (!dddsComNove.has(ddd)) {
+                        // remove o 9 pois esse DDD não exige
+                        return '55' + ddd + resto.substring(1);
+                    }
+                    return '55' + numero;
                 }
             }
-            
-            // Se tem 10 dígitos (DDD + 8), apenas adiciona o 55
+
+            // CASO 2: 10 dígitos (DDD + 8)
             if (numero.length === 10) {
+                if (dddsComNove.has(ddd) && !resto.startsWith('9')) {
+                    return '55' + ddd + '9' + resto;
+                }
                 return '55' + numero;
             }
-            
-            // Se tem 9 dígitos (sem DDD), assume um DDD padrão ou descarta
+
+            // CASO 3: 9 dígitos (sem DDD) — usa DDD padrão
             if (numero.length === 9) {
-                // Aqui você pode definir um DDD padrão ou tratar como erro
-                // Exemplo: assumindo DDD 11 para São Paulo
                 return '5511' + numero;
             }
-            
-            // Para números com mais de 11 dígitos, pega os últimos 10
+
+            // CASO 4: número grande, pega últimos 10
             if (numero.length > 11) {
-                const ultimos10 = numero.substring(numero.length - 10);
+                const ultimos10 = numero.slice(-10);
                 return '55' + ultimos10;
             }
-            
+
             return null;
-        }     
+        }
         const listas = fs.readFileSync('lista.json');
         const c = JSON.parse(listas);
         console.log(x)
