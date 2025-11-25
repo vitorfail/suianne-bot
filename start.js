@@ -189,7 +189,6 @@ wss.on('connection', (ws) => {
                               client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
                             } 
                           }
-
                         }
                         catch(err){
                           console.log("Deu o sguinte erro:"+err)
