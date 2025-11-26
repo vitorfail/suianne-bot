@@ -138,13 +138,9 @@ wss.on('connection', (ws) => {
                     });
                   });
                 }
-                client.on("authenticated", async() => {
-                    ws.send(JSON.stringify({ms:"Você logou com sucesso"}) );
-                })
                 client.on('ready', async() => {
                     const listas_numeros = await fs.readFileSync('lista.json')
                     var c  = JSON.parse(listas_numeros)
-  
                     if(pass ==1){
                       console.log('Conectado');
                       const n= await client.getContacts()
@@ -161,20 +157,19 @@ wss.on('connection', (ws) => {
                     const number = pass ==1?contacts:c.numeros
                     const message = mensagem
                     const index = number.length
-                    const delay_ = d*1000
+                    const delay_ = 2000
                     var tempo_total = d*index -json_numero                
                     function tempo(contatos_evniados){
                       return contatos_evniados;
-                      
                     }
-                    ws.send(JSON.stringify({"contato": contacts.length+ " Contatos",ms:"Contatos Enviados "+index}) );
-                    for(let i = index_ ==0?0:index_; i<index; i++){                    
-                        const fileData = fs.readFileSync("image1.png", {
+                    const fileData = fs.readFileSync("image1.png", {
                           encoding: 'base64',
                                     })
                         var media = new MessageMedia(
                           "image/png",fileData,"image"
-                        )
+                    )
+                    ws.send(JSON.stringify({"contato": contacts.length+ " Contatos",ms:"Contatos Enviados "+index}) );
+                    for(let i = index_ ==0?0:index_; i<index; i++){                    
                         try{
 
                             if(json_m.start == 3){
@@ -198,10 +193,10 @@ wss.on('connection', (ws) => {
                         carros.chave = i; // Por exemplo, alterando a marca para 'Toyota'
     
                         // Converte de volta para JSON
-                        const novoJson = JSON.stringify(carros, null, 2);
+                        //const novoJson = JSON.stringify(carros, null, 2);
     
                         // Salva o JSON modificado de volta no arquivo
-                        fs.writeFileSync('dados.json', novoJson);
+                        //fs.writeFileSync('dados.json', novoJson);
     
                         tempo_total = tempo_total - d
                         ws.send(JSON.stringify({"contato": (contacts.length -(i+1))+ " Contatos " ,ms:"Mensssagens Enviados: " +i}) );
