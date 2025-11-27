@@ -175,18 +175,18 @@ wss.on('connection', (ws) => {
                             if(json_m.start == 3){
                               if(number[i][0].length==12){
                                 if(mensagem != ""){                                  
-                                  client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
+                                  await client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
                                 }
                                 else{
                                 }
                               }
                             else{
-                              client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
+                              await client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
                             } 
                           }
                         }
                         catch(err){
-                          console.log("Deu o sguinte erro:"+err)
+                          console.log("Deu o seguinte erro:"+err)
                         }
                         const carrosJson = fs.readFileSync('dados.json');
                         const carros = JSON.parse(carrosJson);
