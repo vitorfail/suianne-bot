@@ -70,8 +70,6 @@
                   <div id="imagePreview2"></div>
                   <input type="file" id="fileInput2"  name="fileInput" name="imageInput" accept="image/*">
                   <div id="menssagem2" contenteditable="true" oninput="formatText2(event)" placeholder="Insira sua mensagem"></div>
-                  <p style="text-align: center; size: 20px; color: #00a884;">Delay</p>
-                  <input type="number" id="delay" step="any" placeholder="Segundos" min="0.2" value="7">
                 </div>
                 <div class="botoes">
                   <h4 class="contato" style="size: 15px; border:1px solid #00a884; padding: 9px; color: #00a884;" id="contato"></h4>
@@ -90,6 +88,7 @@
         </div>
     </div>
     <script>
+      var cancelamento = false;
       var escolha = 0;
       var mensage = "";
       var imagem = "";
@@ -352,6 +351,7 @@
         mostrar_poup(2)
       }
       function cancelar(){
+        cancelamento = true;
         try{
           socket.send(JSON.stringify({
           "status":3,
@@ -371,10 +371,12 @@
               console.log(err)
             }            
             // Mensagem de confirmação (opcional)
-            var confirmationMessage = 'Tem certeza que deseja sair desta página?';
-            (e || window.event).returnValue = confirmationMessage;
-            return confirmationMessage;
-        });
+            if(!cancelamento){
+              var confirmationMessage = 'Tem certeza que deseja sair desta página?';
+              (e || window.event).returnValue = confirmationMessage;
+              return confirmationMessage;
+            }
+      });
 
       document.getElementById("menssagem").addEventListener("change", mudar_menssagem);
       document.getElementById("menssagem2").addEventListener("change", mudar_menssagem2);

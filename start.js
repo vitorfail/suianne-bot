@@ -177,8 +177,6 @@ wss.on('connection', (ws) => {
                                 if(mensagem != ""){                                  
                                   await client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
                                 }
-                                else{
-                                }
                               }
                             else{
                               await client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
@@ -253,7 +251,51 @@ wss.on('connection', (ws) => {
       ws.send(JSON.stringify({ms:"Imagem adicionada!"}) );
     }
     if(json_m.status == 3){
-      process.exit()
+      // Função para excluir as pastas
+      const deleteFolders = () => {
+        const fs = require('fs');
+        const path = require('path');
+        
+        const foldersToDelete = ['.wwebjs_auth', '.wwebjs_cache'];
+        
+        foldersToDelete.forEach(folder => {
+          try {
+            if (fs.existsSync(folder)) {
+              // Função recursiva para excluir pasta e conteúdo
+              const deleteFolderRecursive = (folderPath) => {
+                if (fs.existsSync(folderPath)) {
+                  fs.readdirSync(folderPath).forEach((file) => {
+                    const curPath = path.join(folderPath, file);
+                    if (fs.lstatSync(curPath).isDirectory()) {
+                      // recurse
+                      deleteFolderRecursive(curPath);
+                    } else {
+                      // delete file
+                      fs.unlinkSync(curPath);
+                    }
+                  });
+                  fs.rmdirSync(folderPath);
+                  console.log(`Pasta ${folder} excluída com sucesso`);
+                }
+              };
+              
+              deleteFolderRecursive(folder);
+            } else {
+              console.log(`Pasta ${folder} não encontrada`);
+            }
+          } catch (err) {
+            console.error(`Erro ao excluir pasta ${folder}:`, err);
+          }
+        });
+      };
+      
+      // Executa a função de exclusão antes de sair
+      deleteFolders();
+      
+      // Aguarda um pouco para garantir que a exclusão foi processada
+      setTimeout(() => {
+        process.exit();
+      }, 1000);
     }
     if(json_m.status == 4){
 
