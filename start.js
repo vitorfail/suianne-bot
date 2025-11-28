@@ -201,7 +201,9 @@ wss.on('connection', (ws) => {
                         tempo_total = tempo_total - d
                         ws.send(JSON.stringify({"contato": (contacts.length -(i+1))+ " Contatos " ,ms:"Mensssagens Enviados: " +i}) );
                         console.log(i)
-                        await new Promise(resolve => setTimeout(resolve, delay_));
+                         // POR ESTA:
+                        const randomDelay = Math.random() * (1500 - 300) + 300; // Entre 300ms e 1500ms
+                        await new Promise(resolve => setTimeout(resolve, randomDelay));
                     }
                     ws.send(JSON.stringify({ms:"Disparo concluido!"}) );
                     const carrosJson = fs.readFileSync('dados.json');
