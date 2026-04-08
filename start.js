@@ -171,24 +171,29 @@ wss.on('connection', (ws) => {
                     ws.send(JSON.stringify({"contato": contacts.length+ " Contatos",ms:"Contatos Enviados "+index}) );
                     for(let i = index_ ==0?0:index_; i<index; i++){                    
                         try{
-
                             if(json_m.start == 3){
+                              console.log("oi2");
                               if(number[i][0].length==12){
-                                if(mensagem != ""){                                  
-                                  await client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
+                                if(mensagem != ""){
+                                  await client.sendMessage(number[i][0], media, {caption: message.replace("#nome", number[i][1])})
                                 }
                               }
-                            else{
-                              await client.sendMessage(number[i][0]+"@c.us", media, {caption: message.replace("#nome", number[i][1])})
-                            } 
-                          }
+                              else{
+                                await client.sendMessage(number[i][0], media, {caption: message.replace("#nome", number[i][1])})
+                              } 
+                            }
+                            if(json_m.start ==1){
+                                console.log("oi2");
+                                await client.sendMessage(number[i][0], media, {caption: message.replace("#nome", number[i][1])})
+                            }
+
                         }
                         catch(err){
                           console.log("Deu o seguinte erro:"+err)
                         }
                         const carrosJson = fs.readFileSync('dados.json');
                         const carros = JSON.parse(carrosJson);
-                        carros.chave = i; // Por exemplo, alterando a marca para 'Toyota'
+                        carros.chave = i;
     
                         // Converte de volta para JSON
                         //const novoJson = JSON.stringify(carros, null, 2);
