@@ -10,6 +10,7 @@ require('dotenv').config();
 
 var contacts = []
 var start = false
+var isSending = false; // Flag to prevent multiple concurrent sending operations
 
 
 // Criar um servidor HTTP
@@ -77,6 +78,12 @@ wss.on('connection', (ws) => {
   ws.on('message', async (message) => {
     var json_m = JSON.parse(message)
     if(json_m.status == 1){
+      // Prevent multiple concurrent sending operations
+      if(isSending){
+        ws.send(JSON.stringify({ms:"Já existe um disparo em andamento. Aguarde sua conclusão."}));
+        return;
+      }
+      isSending = true; // Set sending flag
       const pasta = path.join(__dirname, 'dados.json');
       // Ler o conteúdo do arquivo JSON
       let json_numero;
@@ -169,7 +176,7 @@ wss.on('connection', (ws) => {
                           "image/png",fileData,"image"
                     )
                     ws.send(JSON.stringify({"contato": contacts.length+ " Contatos",ms:"Contatos Enviados "+index}) );
-                    for(let i = index_ ==0?0:index_; i<index; i++){                    
+                    for(let i = index_ ==0?0:index_; i<index; i++){
                         try{
                             if(json_m.start == 3){
                               console.log("oi2");
@@ -180,9 +187,9 @@ wss.on('connection', (ws) => {
                               }
                               else{
                                 await client.sendMessage(number[i][0], media, {caption: message.replace("#nome", number[i][1])})
-                              } 
+                              }
                             }
-                            if(json_m.start ==1){
+                            else if(json_m.start ==1){
                                 console.log("oi2");
                                 await client.sendMessage(number[i][0], media, {caption: message.replace("#nome", number[i][1])})
                             }
@@ -213,6 +220,7 @@ wss.on('connection', (ws) => {
                     const carros = JSON.parse(carrosJson);
                     carros.chave = 0; // Por exemplo, alterando a marca para 'Toyota'
                     console.log('\x1b[32m%s\x1b[0m', "Menssagens enviadas com sucesso ✔️")
+                    isSending = false; // Reset sending flag after completion
                 });
                 /*client.on('authenticated', async (s) => {
                   fs.writeFile("./session.json", JSON.stringify(s), (err) => {
